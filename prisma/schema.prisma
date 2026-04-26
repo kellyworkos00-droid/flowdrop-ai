@@ -55,6 +55,8 @@ model WorkspaceMember {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
+  @@index([workspaceId])
+  @@index([userId])
 }
 
 model Drop {
@@ -71,4 +73,9 @@ model Drop {
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   assignee  User?     @relation("Assignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, status, updatedAt])
+  @@index([workspaceId, assigneeId, status])
+  @@index([workspaceId, dueDate, status])
+  @@index([workspaceId, createdAt])
 }

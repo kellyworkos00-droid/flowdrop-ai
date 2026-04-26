@@ -29,7 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropZone } from "@/components/ui/drop-zone";
 import { evaluateRules, rankDropsForToday } from "@/lib/automation/rules";
-import { getDrops } from "@/lib/drops";
+import { getDrops, getDropsMetrics } from "@/lib/drops";
 import { useDropsStore } from "@/store/useDropsStore";
 import { useUserStore } from "@/store/useUserStore";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
@@ -38,7 +38,8 @@ export default function HomePage() {
   const { drops, selectDrop, setNewDropModalOpen, setDrops } = useDropsStore();
   const { workspace } = useWorkspaceStore();
   const { user } = useUserStore();
-  const query = useQuery({ queryKey: ["drops"], queryFn: getDrops });
+  const query = useQuery({ queryKey: ["drops"], queryFn: getDrops, staleTime: 15_000 });
+  const metricsQuery = useQuery({ queryKey: ["drops-metrics"], queryFn: getDropsMetrics, staleTime: 120_000 });
 
   useEffect(() => {
     if (query.data) setDrops(query.data);
@@ -67,9 +68,9 @@ export default function HomePage() {
   const automationSignals = useMemo(() => evaluateRules(drops), [drops]);
   const criticalCount = automationSignals.filter((s) => s.severity === "critical").length;
 
-  const totalDrops = drops.length;
-  const inProgressDrops = drops.filter((d) => d.status === "in_progress").length;
-  const doneDrops = drops.filter((d) => d.status === "done").length;
+  const totalDrops = metricsQuery.data?.total ?? drops.length;
+  const inProgressDrops = metricsQuery.data?.inProgress ?? drops.filter((d) => d.status === "in_progress").length;
+  const doneDrops = metricsQuery.data?.done ?? drops.filter((d) => d.status === "done").length;
 
   if (drops.length === 0) {
     return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDownWideNarrow, Bookmark, Filter, ListFilter, Search, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -64,13 +64,14 @@ function sortDrops(items: DropItem[], sortMode: SortMode): DropItem[] {
 export default function DropsPage() {
   const { user } = useUserStore();
   const { drops, selectDrop, setDrops } = useDropsStore();
-  const query = useQuery({ queryKey: ["drops"], queryFn: getDrops });
+  const query = useQuery({ queryKey: ["drops"], queryFn: getDrops, staleTime: 15_000 });
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [assignedToMeOnly, setAssignedToMeOnly] = useState(false);
   const [activeView, setActiveView] = useState<string | null>(null);
+  const deferredSearch = useDeferredValue(search);
 
   function applyView(view: SavedView) {
     setActiveView(view.id);
@@ -92,7 +93,7 @@ export default function DropsPage() {
   }, [query.data, setDrops]);
 
   const filteredDrops = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
+    const normalizedSearch = deferredSearch.trim().toLowerCase();
 
     const base = drops.filter((drop) => {
       if (statusFilter !== "all" && drop.status !== statusFilter) {
@@ -116,17 +117,30 @@ export default function DropsPage() {
     });
 
     return sortDrops(base, sortMode);
-  }, [assignedToMeOnly, drops, search, sortMode, statusFilter, typeFilter, user.name]);
+  }, [assignedToMeOnly, deferredSearch, drops, sortMode, statusFilter, typeFilter, user.name]);
+
+  const groupedByStatus = useMemo(() => {
+    const grouped: Record<DropStatus, DropItem[]> = {
+      todo: [],
+      in_progress: [],
+      blocked: [],
+      done: [],
+    };
+    filteredDrops.forEach((drop) => {
+      grouped[drop.status].push(drop);
+    });
+    return grouped;
+  }, [filteredDrops]);
 
   const counts = useMemo(
     () => ({
       all: filteredDrops.length,
-      todo: filteredDrops.filter((drop) => drop.status === "todo").length,
-      in_progress: filteredDrops.filter((drop) => drop.status === "in_progress").length,
-      blocked: filteredDrops.filter((drop) => drop.status === "blocked").length,
-      done: filteredDrops.filter((drop) => drop.status === "done").length,
+      todo: groupedByStatus.todo.length,
+      in_progress: groupedByStatus.in_progress.length,
+      blocked: groupedByStatus.blocked.length,
+      done: groupedByStatus.done.length,
     }),
-    [filteredDrops],
+    [filteredDrops.length, groupedByStatus.blocked.length, groupedByStatus.done.length, groupedByStatus.in_progress.length, groupedByStatus.todo.length],
   );
 
   const lanes = useMemo(
@@ -245,7 +259,7 @@ export default function DropsPage() {
 
       <div className="grid gap-4 xl:grid-cols-4">
         {lanes.map((lane) => {
-          const laneDrops = filteredDrops.filter((drop) => drop.status === lane.key);
+          const laneDrops = groupedByStatus[lane.key];
           return (
             <article key={lane.key} className="rounded-[var(--radius-lg)] border border-white/10 bg-[var(--color-surface-1)] p-3">
               <div className="mb-3 border-b border-white/8 pb-2">

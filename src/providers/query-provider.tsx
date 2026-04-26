@@ -13,8 +13,10 @@ export function QueryProvider({ children }: QueryProviderProps) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000,
+            staleTime: 30 * 1000,
+            gcTime: 10 * 60 * 1000,
             refetchOnWindowFocus: false,
+            retry: 1,
           },
         },
       }),
