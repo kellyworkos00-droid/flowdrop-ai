@@ -54,10 +54,16 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#0D0F1A] p-6">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#0D0F1A] px-6 py-10">
       <OrbBackground />
-      <div className="relative z-[1] w-full max-w-[480px]">
-        <StepIndicator total={3} current={currentStep} />
+      <div className="relative z-[1] w-full max-w-[520px]">
+        <div className="mb-6 text-center">
+          <h1 className="font-[var(--font-display)] text-[30px] font-semibold text-[#F0F2FF]">Build your flow in minutes</h1>
+          <p className="mt-1 text-[14px] text-[#8B90B8]">No setup maze, just three quick steps.</p>
+        </div>
+        <div className="flex justify-center">
+          <StepIndicator total={3} current={currentStep} />
+        </div>
         <AnimatePresence mode="wait">
           {currentStep === 0 ? (
             <StepProfile

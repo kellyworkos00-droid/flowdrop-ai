@@ -1,33 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { Hand } from "lucide-react";
 import { OnboardingCard } from "@/components/onboarding/OnboardingCard";
 import { NextButton } from "@/components/onboarding/NextButton";
+import { StepIcon } from "@/components/onboarding/StepIcon";
 import { useOnboardingStore } from "@/lib/stores/onboardingStore";
 
 const ROLES = ["Founder", "Designer", "Developer", "Product Manager", "Marketing", "Operations", "Other"];
-
-function StepIcon({ emoji, color, border }: { emoji: string; color: string; border: string }) {
-  return (
-    <div
-      style={{
-        width: 52,
-        height: 52,
-        borderRadius: 14,
-        background: color,
-        border: `1px solid ${border}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 24,
-        marginBottom: 20,
-      }}
-      aria-hidden
-    >
-      {emoji}
-    </div>
-  );
-}
 
 export function StepProfile({ onNext }: { onNext: () => void }) {
   const onboarding = useOnboardingStore();
@@ -39,7 +19,11 @@ export function StepProfile({ onNext }: { onNext: () => void }) {
 
   return (
     <OnboardingCard>
-      <StepIcon emoji="👋" color="rgba(0,229,195,0.1)" border="rgba(0,229,195,0.2)" />
+      <StepIcon
+        icon={<Hand className="h-6 w-6 text-[#00E5C3]" />}
+        color="rgba(0,229,195,0.1)"
+        border="rgba(0,229,195,0.2)"
+      />
       <h2 className="mb-1 font-[var(--font-display)] text-[28px] font-semibold text-[#F0F2FF]">Let&apos;s get you set up</h2>
       <p className="mb-5 text-[14px] text-[#8B90B8]">Takes 60 seconds. No credit card. No setup hell.</p>
 

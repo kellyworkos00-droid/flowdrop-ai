@@ -1,15 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Check, type LucideIcon } from "lucide-react";
 
 interface TypeCardProps {
-  icon: string;
+  icon: LucideIcon;
   label: string;
   selected: boolean;
   onClick: () => void;
 }
 
 export function TypeCard({ icon, label, selected, onClick }: TypeCardProps) {
+  const Icon = icon;
+
   return (
     <motion.button
       type="button"
@@ -24,9 +27,13 @@ export function TypeCard({ icon, label, selected, onClick }: TypeCardProps) {
       }`}
     >
       {selected ? (
-        <span className="absolute right-2 top-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#2D6BE4] text-[10px] text-white">✓</span>
+        <span className="absolute right-2 top-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#2D6BE4] text-[10px] text-white">
+          <Check className="h-3 w-3" />
+        </span>
       ) : null}
-      <div className="mb-2 text-[20px]">{icon}</div>
+      <div className="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#252A42] text-[#AFC4FF]">
+        <Icon className="h-5 w-5" />
+      </div>
       <div className="text-[12px] font-medium text-[#F0F2FF]">{label}</div>
     </motion.button>
   );

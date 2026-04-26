@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { CircleCheckBig, Sparkles } from "lucide-react";
 import { OrbBackground } from "@/components/onboarding/OrbBackground";
 import { NextButton } from "@/components/onboarding/NextButton";
 
@@ -25,11 +26,10 @@ export default function FirstDropPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 24,
             margin: "0 auto 20px",
           }}
         >
-          ✓
+          <CircleCheckBig className="h-6 w-6 text-[#00C48C]" />
         </motion.div>
 
         <h2 className="mb-2 font-[var(--font-display)] text-[34px] font-semibold text-[#F0F2FF]">First drop landed.</h2>
@@ -48,7 +48,9 @@ export default function FirstDropPage() {
             margin: "0 auto 24px",
           }}
         >
-          <div style={{ fontSize: 11, color: "#00E5C3", fontWeight: 500, marginBottom: 8 }}>✦ FlowDrop AI</div>
+          <div style={{ fontSize: 11, color: "#00E5C3", fontWeight: 500, marginBottom: 8 }} className="inline-flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5" /> FlowDrop AI
+          </div>
           <div style={{ fontSize: 13, color: "#8B90B8", lineHeight: 1.6 }}>
             I&apos;ll watch how your team works over the next few days. Once I see patterns, I&apos;ll suggest structure — no setup needed from you.
           </div>

@@ -14,12 +14,14 @@ export function OnboardingCard({ children }: OnboardingCardProps) {
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
       style={{
-        background: "#141726",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "linear-gradient(180deg, rgba(30,34,54,0.95) 0%, rgba(20,23,38,0.95) 100%)",
+        border: "1px solid rgba(255,255,255,0.1)",
         borderRadius: 20,
-        padding: "36px 32px",
+        padding: "38px 34px",
         width: "100%",
         maxWidth: 460,
+        boxShadow: "0 20px 60px rgba(2,6,23,0.55)",
+        backdropFilter: "blur(12px)",
       }}
       className="relative z-10"
     >

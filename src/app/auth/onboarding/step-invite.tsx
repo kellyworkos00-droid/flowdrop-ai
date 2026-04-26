@@ -2,33 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence } from "framer-motion";
+import { Users } from "lucide-react";
 import { OnboardingCard } from "@/components/onboarding/OnboardingCard";
 import { InvitePill } from "@/components/onboarding/InvitePill";
 import { NextButton } from "@/components/onboarding/NextButton";
 import { SkipButton } from "@/components/onboarding/SkipButton";
+import { StepIcon } from "@/components/onboarding/StepIcon";
 import { useOnboardingStore } from "@/lib/stores/onboardingStore";
-
-function StepIcon({ emoji, color, border }: { emoji: string; color: string; border: string }) {
-  return (
-    <div
-      style={{
-        width: 52,
-        height: 52,
-        borderRadius: 14,
-        background: color,
-        border: `1px solid ${border}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 24,
-        marginBottom: 20,
-      }}
-      aria-hidden
-    >
-      {emoji}
-    </div>
-  );
-}
 
 export function StepInvite({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
   const onboarding = useOnboardingStore();
@@ -54,7 +34,11 @@ export function StepInvite({ onNext, onSkip }: { onNext: () => void; onSkip: () 
 
   return (
     <OnboardingCard>
-      <StepIcon emoji="👥" color="rgba(45,107,228,0.1)" border="rgba(45,107,228,0.2)" />
+      <StepIcon
+        icon={<Users className="h-6 w-6 text-[#6B9FFF]" />}
+        color="rgba(45,107,228,0.1)"
+        border="rgba(45,107,228,0.2)"
+      />
       <h2 className="mb-1 font-[var(--font-display)] text-[28px] font-semibold text-[#F0F2FF]">Who&apos;s on your team?</h2>
       <p className="mb-5 text-[14px] text-[#8B90B8]">Invite them now or skip — you can always do this later.</p>
 

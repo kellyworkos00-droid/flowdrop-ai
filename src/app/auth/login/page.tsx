@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Building2, Globe, LockKeyhole, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { OrbBackground } from "@/components/onboarding/OrbBackground";
 
@@ -10,13 +11,13 @@ export default function LoginPage() {
 
   return (
     <div className="grid min-h-dvh overflow-hidden md:grid-cols-[55fr_45fr]">
-      <section className="relative order-1 overflow-hidden bg-[#0D0F1A] p-8 md:order-none md:min-h-dvh">
+      <section className="relative order-1 overflow-hidden bg-[#0D0F1A] px-8 py-10 md:order-none md:min-h-dvh md:px-12">
         <OrbBackground />
-        <div className="relative z-[1] flex items-center gap-1 font-[var(--font-display)] text-[18px] font-semibold text-[#F0F2FF]">
+        <div className="relative z-[1] inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-[var(--font-display)] text-[18px] font-semibold text-[#F0F2FF]">
           FlowDrop <span className="inline-block h-[7px] w-[7px] rounded-full bg-[#00E5C3]" />
         </div>
 
-        <div className="relative z-[1] mx-auto my-16 max-w-xl md:my-28">
+        <div className="relative z-[1] mx-auto my-14 max-w-xl md:my-24">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -53,6 +54,16 @@ export default function LoginPage() {
               <span className="font-medium text-[#F0F2FF]">2,400+</span> teams already flowing
             </p>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1], delay: 0.36 }}
+            className="mt-8 max-w-md rounded-2xl border border-[rgba(0,229,195,0.2)] bg-[rgba(0,229,195,0.06)] p-4"
+          >
+            <p className="text-[12px] font-medium tracking-[0.12em] text-[#00E5C3]">FLOWDROP SIGNAL</p>
+            <p className="mt-1 text-[14px] leading-relaxed text-[#A8B0D3]">Teams that finish onboarding in under 90 seconds are 3x more likely to ship in week one.</p>
+          </motion.div>
         </div>
 
         <div className="relative z-[1] flex flex-wrap gap-2 pb-2">
@@ -75,7 +86,7 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          className="w-full max-w-[340px]"
+          className="flow-glass w-full max-w-[360px] rounded-2xl p-6"
         >
           <h1 className="font-[var(--font-display)] text-[20px] font-semibold text-[#F0F2FF]">Welcome back</h1>
           <p className="mb-4 mt-1 text-[13px] text-[#8B90B8]">Sign in or create your account</p>
@@ -83,30 +94,38 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => router.push("/auth/onboarding")}
-            className="mb-2 flex h-11 w-full items-center justify-center rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] text-[13px] text-[#F0F2FF] transition-all duration-180 hover:border-[rgba(255,255,255,0.2)]"
+            className="mb-2 flex h-11 w-full items-center justify-center gap-2 rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] text-[13px] text-[#F0F2FF] transition-all duration-180 hover:border-[rgba(255,255,255,0.2)]"
           >
+            <Globe className="h-4 w-4 text-[#9FB5FF]" />
             Continue with Google
           </button>
           <button
             type="button"
             onClick={() => router.push("/auth/onboarding")}
-            className="mb-3 flex h-11 w-full items-center justify-center rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] text-[13px] text-[#F0F2FF] transition-all duration-180 hover:border-[rgba(255,255,255,0.2)]"
+            className="mb-3 flex h-11 w-full items-center justify-center gap-2 rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] text-[13px] text-[#F0F2FF] transition-all duration-180 hover:border-[rgba(255,255,255,0.2)]"
           >
+            <Building2 className="h-4 w-4 text-[#9FB5FF]" />
             Continue with Microsoft
           </button>
 
           <div className="mb-3 text-center text-[12px] text-[#555A7A]">or email</div>
 
-          <input
-            type="email"
-            placeholder="you@company.com"
-            className="mb-2 h-[42px] w-full rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] px-[14px] text-[13px] text-[#F0F2FF] outline-none transition-colors focus:border-[#2D6BE4]"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="mb-3 h-[42px] w-full rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] px-[14px] text-[13px] text-[#F0F2FF] outline-none transition-colors focus:border-[#2D6BE4]"
-          />
+          <label className="mb-2 flex items-center gap-2 rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] px-[12px]">
+            <Mail className="h-4 w-4 text-[#6D7598]" />
+            <input
+              type="email"
+              placeholder="you@company.com"
+              className="h-[42px] w-full bg-transparent text-[13px] text-[#F0F2FF] outline-none"
+            />
+          </label>
+          <label className="mb-3 flex items-center gap-2 rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-[#1E2236] px-[12px]">
+            <LockKeyhole className="h-4 w-4 text-[#6D7598]" />
+            <input
+              type="password"
+              placeholder="Password"
+              className="h-[42px] w-full bg-transparent text-[13px] text-[#F0F2FF] outline-none"
+            />
+          </label>
 
           <button
             type="button"

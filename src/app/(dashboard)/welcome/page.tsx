@@ -1,19 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { ArrowDownToLine, MessageSquareText, Paperclip, SquareCheckBig } from "lucide-react";
 import { motion } from "framer-motion";
 import { OrbBackground } from "@/components/onboarding/OrbBackground";
 import { DropZone } from "@/components/onboarding/DropZone";
 import { postDrop } from "@/lib/api/onboarding";
 import { useOnboardingStore } from "@/lib/stores/onboardingStore";
 
-function QuickActionPill({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
+function QuickActionPill({
+  icon,
+  children,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="cursor-pointer rounded-full border border-[rgba(255,255,255,0.08)] bg-[#141726] px-4 py-2 text-[12px] text-[#8B90B8] transition-all duration-180 hover:border-[rgba(45,107,228,0.35)] hover:text-[#F0F2FF]"
+      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[#141726] px-4 py-2 text-[12px] text-[#8B90B8] transition-all duration-180 hover:border-[rgba(45,107,228,0.35)] hover:text-[#F0F2FF]"
     >
+      {icon}
       {children}
     </button>
   );
@@ -40,7 +50,7 @@ export default function WelcomePage() {
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#0D0F1A] p-6">
       <OrbBackground />
-      <div className="relative z-[1] w-full max-w-[760px] text-center">
+      <div className="flow-glass relative z-[1] w-full max-w-[760px] rounded-[28px] px-6 py-10 text-center md:px-10">
         <motion.div
           animate={{
             boxShadow: [
@@ -59,11 +69,10 @@ export default function WelcomePage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 32,
             margin: "0 auto 24px",
           }}
         >
-          ⬇
+          <ArrowDownToLine className="h-8 w-8 text-[#00E5C3]" />
         </motion.div>
 
         <h1 className="mb-2 font-[var(--font-display)] text-[38px] font-semibold text-[#F0F2FF]">
@@ -73,7 +82,7 @@ export default function WelcomePage() {
           Tasks, ideas, files, decisions — just drop them in. FlowDrop figures out the rest over time.
         </p>
 
-        <div className="mb-5 flex justify-center">
+        <div className="mb-6 flex justify-center">
           <DropZone
             onDrop={() => {
               void createFirstDrop("First file drop", "file");
@@ -84,12 +93,16 @@ export default function WelcomePage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {["+ Add a task", "📎 Upload a file", "💬 Write a note"].map((label) => (
-            <QuickActionPill key={label} onClick={() => void createFirstDrop(label, "task")}>
-              {label}
-            </QuickActionPill>
-          ))}
+        <div className="mx-auto flex max-w-[560px] flex-wrap items-center justify-center gap-2">
+          <QuickActionPill icon={<SquareCheckBig className="h-3.5 w-3.5" />} onClick={() => void createFirstDrop("Add a task", "task")}>
+            Add a task
+          </QuickActionPill>
+          <QuickActionPill icon={<Paperclip className="h-3.5 w-3.5" />} onClick={() => void createFirstDrop("Upload a file", "file")}>
+            Upload a file
+          </QuickActionPill>
+          <QuickActionPill icon={<MessageSquareText className="h-3.5 w-3.5" />} onClick={() => void createFirstDrop("Write a note", "note")}>
+            Write a note
+          </QuickActionPill>
         </div>
       </div>
     </div>

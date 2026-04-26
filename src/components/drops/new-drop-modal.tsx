@@ -4,6 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertTriangle, Lightbulb, Link2, MessageSquareText, Paperclip, SquareCheckBig, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
@@ -19,13 +20,13 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const types: { key: DropType; label: string; icon: string }[] = [
-  { key: "task", label: "Task", icon: "📋" },
-  { key: "idea", label: "Idea", icon: "💡" },
-  { key: "file", label: "File", icon: "📎" },
-  { key: "link", label: "Link", icon: "🔗" },
-  { key: "blocker", label: "Blocker", icon: "⚠️" },
-  { key: "note", label: "Note", icon: "💬" },
+const types: { key: DropType; label: string; icon: LucideIcon }[] = [
+  { key: "task", label: "Task", icon: SquareCheckBig },
+  { key: "idea", label: "Idea", icon: Lightbulb },
+  { key: "file", label: "File", icon: Paperclip },
+  { key: "link", label: "Link", icon: Link2 },
+  { key: "blocker", label: "Blocker", icon: AlertTriangle },
+  { key: "note", label: "Note", icon: MessageSquareText },
 ];
 
 export function NewDropModal() {
@@ -66,18 +67,21 @@ export function NewDropModal() {
   return (
     <Modal open={isNewDropModalOpen} onClose={() => setNewDropModalOpen(false)} title="Drop something in">
       <div className="mb-4 flex flex-wrap gap-2 border-b border-white/8 pb-4">
-        {types.map((entry) => (
-          <button
-            key={entry.key}
-            type="button"
-            onClick={() => setType(entry.key)}
-            className={`focus-ring rounded-[var(--radius-md)] px-3 py-2 text-[13px] ${
-              type === entry.key ? "border-b-2 border-[var(--color-brand-primary)] text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)]"
-            }`}
-          >
-            {entry.icon} {entry.label}
-          </button>
-        ))}
+        {types.map((entry) => {
+          const Icon = entry.icon;
+          return (
+            <button
+              key={entry.key}
+              type="button"
+              onClick={() => setType(entry.key)}
+              className={`focus-ring inline-flex items-center gap-1.5 rounded-[var(--radius-md)] px-3 py-2 text-[13px] ${
+                type === entry.key ? "border-b-2 border-[var(--color-brand-primary)] text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)]"
+              }`}
+            >
+              <Icon className="h-4 w-4" /> {entry.label}
+            </button>
+          );
+        })}
       </div>
       <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
         <Input {...form.register("title")} placeholder="What's on your mind?" className="h-12 text-[20px]" />

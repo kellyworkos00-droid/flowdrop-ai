@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Droplets, MessageSquareText, Paperclip, SquareCheckBig } from "lucide-react";
 import { AICard } from "@/components/ui/ai-card";
 import { DropCard } from "@/components/ui/drop-card";
 import { Avatar } from "@/components/ui/avatar";
@@ -29,9 +30,9 @@ export default function HomePage() {
         <AICard title="You have 3 things waiting on you today." description="Two approvals, one blocker, and one high-priority task due this afternoon." />
         {drops.length === 0 ? (
           <div className="mt-5 flex min-h-[70dvh] items-center justify-center">
-            <article className="w-full max-w-[540px] rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-6 text-center">
+            <article className="w-full max-w-[540px] rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-6 text-center shadow-[var(--shadow-md)]">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ai-glow)] text-[var(--color-brand-accent)]" style={{ animation: "drop-pulse 1.8s ease-in-out infinite" }}>
-                💧
+                <Droplets className="h-6 w-6" />
               </div>
               <h3 className="font-[var(--font-display)] text-[24px] font-semibold">Drop anything to start.</h3>
               <p className="mx-auto mt-2 max-w-md text-[15px] text-[var(--color-text-secondary)]">
@@ -39,9 +40,9 @@ export default function HomePage() {
               </p>
               <DropZone className="mt-4" />
               <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                <Button variant="secondary" size="sm" onClick={() => setNewDropModalOpen(true)}>+ Add a task</Button>
-                <Button variant="secondary" size="sm">📎 Upload a file</Button>
-                <Button variant="secondary" size="sm">💬 Write a note</Button>
+                <Button variant="secondary" size="sm" onClick={() => setNewDropModalOpen(true)} className="gap-1.5"><SquareCheckBig className="h-3.5 w-3.5" />Add a task</Button>
+                <Button variant="secondary" size="sm" className="gap-1.5"><Paperclip className="h-3.5 w-3.5" />Upload a file</Button>
+                <Button variant="secondary" size="sm" className="gap-1.5"><MessageSquareText className="h-3.5 w-3.5" />Write a note</Button>
               </div>
             </article>
           </div>
