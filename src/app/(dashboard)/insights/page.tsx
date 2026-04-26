@@ -1,13 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { AlertTriangle, Brain, BarChart2, ChartColumnIncreasing, Gauge, Lightbulb, Target, TimerReset, TrendingDown, TrendingUp } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { AlertTriangle, Brain, BarChart2, ChartColumnIncreasing, Gauge, Lightbulb, RefreshCw, Target, TimerReset, TrendingDown, TrendingUp } from "lucide-react";
 import { InsightCard } from "@/components/ai/insight-card";
 import { NudgeBanner } from "@/components/ai/nudge-banner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { computeTeamKPIs, formatHours } from "@/lib/kpi/compute";
+import { sendTelemetryEvent } from "@/lib/telemetry/client";
 import { useDropsStore } from "@/store/useDropsStore";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
@@ -25,6 +28,93 @@ export default function InsightsPage() {
   const [signalFilter, setSignalFilter] = useState<SignalFilter>("all");
   const [memberFilter, setMemberFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+
+  const jobQuery = useQuery({
+    queryKey: ["insight-job", activeJobId],
+    enabled: Boolean(activeJobId),
+    refetchInterval: (queryState) => {
+      const status = (queryState.state.data as { job?: { status?: string } } | undefined)?.job?.status;
+      return status === "completed" || status === "failed" ? false : 1_200;
+    },
+    queryFn: async () => {
+      const response = await fetch(`/api/ai/insights/jobs/${activeJobId}`, { headers: { Accept: "application/json" } });
+      if (!response.ok) {
+        throw new Error("Failed to fetch insight job status");
+      }
+      return (await response.json()) as {
+        job: {
+          id: string;
+          status: "queued" | "running" | "completed" | "failed";
+          snapshot?: { summary: string; generatedAt: string; throughput: number; blockerRate: number; riskCount: number };
+          error?: string;
+        };
+      };
+    },
+  });
+
+  const latestJobsQuery = useQuery({
+    queryKey: ["insight-jobs-list"],
+    staleTime: 20_000,
+    queryFn: async () => {
+      const response = await fetch("/api/ai/insights/jobs", { headers: { Accept: "application/json" } });
+      if (!response.ok) {
+        throw new Error("Failed to fetch insight jobs");
+      }
+      return (await response.json()) as {
+        latestSnapshot: { summary: string; generatedAt: string; throughput: number; blockerRate: number; riskCount: number } | null;
+      };
+    },
+  });
+
+  const activeJobStatus = jobQuery.data?.job?.status;
+  const activeSnapshot = jobQuery.data?.job?.snapshot ?? latestJobsQuery.data?.latestSnapshot ?? null;
+
+  async function runInsightRefresh(): Promise<void> {
+    const response = await fetch("/api/ai/insights/jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workspaceId: workspace.id, window: windowFilter }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not enqueue insight refresh");
+    }
+
+    const payload = (await response.json()) as { job: { id: string } };
+    setActiveJobId(payload.job.id);
+
+    sendTelemetryEvent({
+      name: "insight_refresh_enqueued",
+      level: "info",
+      route: "/insights",
+      meta: { window: windowFilter },
+    });
+  }
+
+  useEffect(() => {
+    if (!activeJobStatus) {
+      return;
+    }
+
+    if (activeJobStatus === "completed") {
+      sendTelemetryEvent({
+        name: "insight_refresh_completed",
+        level: "info",
+        route: "/insights",
+      });
+      void latestJobsQuery.refetch();
+      return;
+    }
+
+    if (activeJobStatus === "failed") {
+      sendTelemetryEvent({
+        name: "insight_refresh_failed",
+        level: "error",
+        route: "/insights",
+      });
+    }
+  }, [activeJobStatus, latestJobsQuery]);
 
   const scopedDrops = useMemo(() => {
     if (memberFilter === "all") {
@@ -160,9 +250,41 @@ export default function InsightsPage() {
               Live intelligence on flow health, execution risk, and where your team can move faster.
             </p>
           </div>
-          <Badge className="border-[var(--color-ai-border)] text-[var(--color-ai-text)]">
-            <Brain className="mr-1 h-3.5 w-3.5" /> {stats.confidence}% confidence
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className="border-[var(--color-ai-border)] text-[var(--color-ai-text)]">
+              <Brain className="mr-1 h-3.5 w-3.5" /> {stats.confidence}% confidence
+            </Badge>
+            <Button size="sm" variant="secondary" className="gap-1.5" onClick={() => void runInsightRefresh()}>
+              <RefreshCw className={`h-3.5 w-3.5 ${activeJobStatus === "running" || activeJobStatus === "queued" ? "animate-spin" : ""}`} />
+              Refresh async
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-[var(--radius-md)] border border-white/10 bg-[var(--color-surface-2)] p-3">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-[var(--color-text-secondary)]">
+            <span>Insight engine:</span>
+            <span
+              className={`rounded-full px-2 py-0.5 ${
+                activeJobStatus === "failed"
+                  ? "bg-[rgba(255,77,109,0.15)] text-[var(--color-danger)]"
+                  : activeJobStatus === "completed"
+                    ? "bg-[rgba(0,196,140,0.18)] text-[var(--color-success)]"
+                    : "bg-[rgba(45,107,228,0.15)] text-[var(--color-brand-primary)]"
+              }`}
+            >
+              {activeJobStatus ?? "idle"}
+            </span>
+            {activeSnapshot?.generatedAt ? <span>Last generated: {new Date(activeSnapshot.generatedAt).toLocaleTimeString()}</span> : null}
+          </div>
+          {activeSnapshot ? (
+            <p className="mt-1 text-[12px] text-[var(--color-text-secondary)]">
+              {activeSnapshot.summary} Throughput {activeSnapshot.throughput}% · Blocker rate {activeSnapshot.blockerRate}% · Risks {activeSnapshot.riskCount}.
+            </p>
+          ) : null}
+          {jobQuery.data?.job?.error ? (
+            <p className="mt-1 text-[12px] text-[var(--color-danger)]">{jobQuery.data.job.error}</p>
+          ) : null}
         </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

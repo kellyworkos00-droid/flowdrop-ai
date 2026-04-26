@@ -1,6 +1,7 @@
 "use client";
 
 import { ToastProvider } from "@/components/ui/toast";
+import { TelemetryClient } from "@/components/system/telemetry-client";
 import { QueryProvider } from "@/providers/query-provider";
 
 interface AppProvidersProps {
@@ -10,6 +11,7 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryProvider>
+      <TelemetryClient />
       <ToastProvider>{children}</ToastProvider>
     </QueryProvider>
   );
