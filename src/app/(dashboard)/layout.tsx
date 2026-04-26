@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/ui/sidebar";
 import { TopBar } from "@/components/ui/top-bar";
+import { CommandPalette } from "@/components/ui/command-palette";
 import { NewDropModal } from "@/components/drops/new-drop-modal";
 import { DropDetailDrawer } from "@/components/drops/drop-detail-drawer";
 import { MobileNav } from "@/components/ui/mobile-nav";
@@ -35,6 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
       <NewDropModal />
       <DropDetailDrawer />
+      <CommandPalette />
       <MobileNav />
     </div>
   );

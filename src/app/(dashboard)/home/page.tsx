@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { AutomationAlerts } from "@/components/drops/automation-alerts";
 import { QuickActionBar } from "@/components/drops/quick-action-bar";
+import { TemplatePlaybooks } from "@/components/drops/template-playbooks";
+import { NotificationIntelligence } from "@/components/ai/notification-intelligence";
 import { AICard } from "@/components/ui/ai-card";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -165,6 +167,9 @@ export default function HomePage() {
           className="border-[rgba(0,229,195,0.22)]"
         />
       )}
+
+      {/* ── Notification intelligence ─────────────────────────────────────── */}
+      <NotificationIntelligence />
 
       {/* ── 5 main panels ───────────────────────────────────────────────────── */}
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr_1fr]">
@@ -338,6 +343,9 @@ export default function HomePage() {
           </article>
         </div>
       </div>
+
+      {/* ── Templates and playbooks ───────────────────────────────────────── */}
+      <TemplatePlaybooks />
 
       {/* ── Team pulse ──────────────────────────────────────────────────────── */}
       <article className="rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-4">
