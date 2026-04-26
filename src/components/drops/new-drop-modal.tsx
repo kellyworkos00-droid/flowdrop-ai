@@ -55,6 +55,7 @@ export function NewDropModal() {
       description: values.description,
       type,
       status: "todo",
+      priority: "normal",
       assignees: [],
       assigneeNames: ["Unassigned"],
       timestamp: "Just now",
