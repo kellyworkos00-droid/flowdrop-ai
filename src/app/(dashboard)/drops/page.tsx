@@ -153,6 +153,39 @@ export default function DropsPage() {
     [],
   );
 
+  if (query.isLoading && drops.length === 0) {
+    return (
+      <section className="space-y-4">
+        <div className="rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-5 shadow-[var(--shadow-md)]">
+          <h2 className="font-[var(--font-display)] text-[22px] font-semibold">My Drops</h2>
+          <p className="mt-1 text-[13px] text-[var(--color-text-secondary)]">Loading your workspace...</p>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <article key={idx} className="rounded-[var(--radius-lg)] border border-white/10 bg-[var(--color-surface-1)] p-3">
+              <div className="mb-3 h-4 w-24 animate-pulse rounded bg-white/10" />
+              <div className="space-y-2">
+                {Array.from({ length: 3 }).map((__, inner) => (
+                  <div key={inner} className="h-20 animate-pulse rounded-[var(--radius-md)] border border-white/10 bg-[var(--color-surface-2)]" />
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (query.isError && drops.length === 0) {
+    return (
+      <section className="rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-6 text-center shadow-[var(--shadow-md)]">
+        <h2 className="font-[var(--font-display)] text-[22px] font-semibold">Could not load drops</h2>
+        <p className="mt-2 text-[13px] text-[var(--color-text-secondary)]">Something went wrong while loading your board.</p>
+        <Button className="mt-4" onClick={() => void query.refetch()}>Try again</Button>
+      </section>
+    );
+  }
+
   return (
     <section className="space-y-4">
       <div className="rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-5 shadow-[var(--shadow-md)]">

@@ -29,7 +29,7 @@ export function DropCard({ drop, className, onClick }: DropCardProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        "flow-card mb-2 w-full rounded-[var(--radius-lg)] border border-white/10 border-l-2 bg-[var(--color-surface-1)] p-[14px] text-left",
+        "flow-card mb-2 w-full rounded-[var(--radius-lg)] border border-white/10 border-l-2 bg-[var(--color-surface-1)] p-[14px] text-left transition-transform duration-150 hover:-translate-y-0.5 hover:border-white/20 active:translate-y-0",
         config.border,
         className,
       )}
