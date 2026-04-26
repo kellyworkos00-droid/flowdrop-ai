@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getTelemetrySummary, listTelemetryEvents, recordTelemetryEvent } from "@/lib/telemetry/events";
+import { appendAuditEntry } from "@/lib/audit/log";
+import { canPerform, getActorContext } from "@/lib/auth/permissions";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -13,6 +15,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const actor = getActorContext(request);
   const body = (await request.json()) as {
     name?: string;
     level?: "info" | "warn" | "error";
@@ -20,6 +23,23 @@ export async function POST(request: Request) {
     durationMs?: number;
     meta?: Record<string, string | number | boolean | null>;
   };
+
+  if (!canPerform(actor.role, "telemetry:write")) {
+    appendAuditEntry({
+      actorId: actor.actorId,
+      actorName: actor.actorName,
+      role: actor.role,
+      workspaceId: actor.workspaceId,
+      action: "telemetry:write",
+      resource: "telemetry-event",
+      outcome: "denied",
+      reason: "Insufficient role permissions",
+      correlationId: actor.correlationId,
+      oldValue: null,
+      newValue: { name: body.name ?? null },
+    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   if (!body.name || !body.level) {
     return NextResponse.json({ error: "name and level are required" }, { status: 400 });

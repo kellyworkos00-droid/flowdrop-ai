@@ -25,8 +25,8 @@ Build a high-performance work operating system where every user can start work i
 - [x] 12) Frontend runtime performance optimization
 - [x] 13) Background jobs for AI insights
 - [x] 14) Error tracking and performance telemetry
-- [ ] 15) Core workflow tests
-- [ ] 16) Permissions and audit trail
+- [x] 15) Core workflow tests
+- [x] 16) Permissions and audit trail
 
 ---
 
@@ -379,11 +379,11 @@ Safer collaboration and enterprise readiness.
 - Phase F (Weeks 11-12): Items 15-16
 
 ## Release Quality Checklist (Apply to Every Feature)
-- [ ] Product acceptance criteria defined
+- [x] Product acceptance criteria defined
 - [ ] Performance budget defined and measured
 - [ ] Analytics events added
-- [ ] Error states and retry UX implemented
-- [ ] Empty/loading states designed
+- [x] Error states and retry UX implemented
+- [x] Empty/loading states designed
 - [ ] Accessibility checks complete
-- [ ] Unit/integration tests added
+- [x] Unit/integration tests added
 - [ ] Documentation and runbook updated
