@@ -15,6 +15,7 @@ const titleMap: Record<string, string> = {
   "/insights": "AI Insights",
   "/files": "Files",
   "/archive": "Archive",
+  "/settings": "Settings",
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

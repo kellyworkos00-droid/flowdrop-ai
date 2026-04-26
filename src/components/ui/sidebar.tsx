@@ -19,6 +19,7 @@ const navItems = [
   { href: "/insights", label: "AI Insights", icon: Sparkles },
   { href: "/files", label: "Files", icon: Folder },
   { href: "/archive", label: "Archive", icon: Archive },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar({ className, pathname }: SidebarProps) {
@@ -74,9 +75,9 @@ export function Sidebar({ className, pathname }: SidebarProps) {
       <div className="mt-3 flex items-center gap-2 rounded-[var(--radius-md)] border border-white/10 bg-white/5 p-2 xl:flex-row lg:flex-col">
         <Avatar name={user.name} size="sm" />
         <span className="hidden text-[13px] xl:inline">{user.name}</span>
-        <button type="button" className="focus-ring ml-auto rounded-full p-1.5 text-[var(--color-text-secondary)] hover:bg-white/8" aria-label="Open settings">
+        <Link href="/settings" className="focus-ring ml-auto rounded-full p-1.5 text-[var(--color-text-secondary)] hover:bg-white/8" aria-label="Open settings">
           <Settings className="h-4 w-4" />
-        </button>
+        </Link>
       </div>
     </aside>
   );

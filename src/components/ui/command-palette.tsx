@@ -164,6 +164,14 @@ export function CommandPalette() {
         keywords: "team workload manager",
         execute: () => router.push("/team"),
       },
+      {
+        id: "cmd_open_settings",
+        type: "command",
+        title: "Open Settings",
+        subtitle: "Manage profile, workspace, and app controls",
+        keywords: "settings preferences profile workspace",
+        execute: () => router.push("/settings"),
+      },
     ];
 
     const dropItems: PaletteItem[] = drops.slice(0, 30).map((drop) => ({

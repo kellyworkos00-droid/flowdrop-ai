@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Folder, Grid2x2, Inbox, Sparkles, Users } from "lucide-react";
+import { Folder, Grid2x2, Inbox, Settings, Sparkles, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -11,6 +11,7 @@ const items = [
   { href: "/team", label: "Team", icon: Users },
   { href: "/insights", label: "AI", icon: Sparkles },
   { href: "/files", label: "Files", icon: Folder },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function MobileNav() {
