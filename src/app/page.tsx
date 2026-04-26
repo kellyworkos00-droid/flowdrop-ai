@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import Script from "next/script";
 import {
   ArrowRight,
   Bot,
@@ -61,9 +63,72 @@ const steps = [
   },
 ];
 
+const screenshots = [
+  {
+    title: "Today Command Center",
+    description:
+      "See top tasks, blockers, overdue risks, and handoffs in one screen so your team starts with clarity every day.",
+    src: "/screenshots/command-center.svg",
+    alt: "FlowDrop command center screenshot showing top tasks and blockers",
+  },
+  {
+    title: "Team Accountability View",
+    description:
+      "Track workload balance, SLA pressure, and manager attention queues to prevent silent bottlenecks.",
+    src: "/screenshots/team-flow.svg",
+    alt: "FlowDrop team flow screenshot with workload and blocker panels",
+  },
+  {
+    title: "Complete Settings Center",
+    description:
+      "Control profile, notifications, automation, permissions, telemetry, and exports from one operational hub.",
+    src: "/screenshots/settings-center.svg",
+    alt: "FlowDrop settings center screenshot with controls and audit options",
+  },
+];
+
+const comparison = [
+  {
+    point: "Work execution",
+    flowdrop: "Command-center workflow with quick actions, keyboard controls, and drag status moves.",
+    others: "Scattered updates across multiple pages with heavy modal friction.",
+  },
+  {
+    point: "Risk visibility",
+    flowdrop: "Built-in blocker SLA alerts, overdue detection, and async AI insight jobs.",
+    others: "Mostly passive boards with delayed risk discovery.",
+  },
+  {
+    point: "Operational trust",
+    flowdrop: "Role-based permissions, append-only audit logs, telemetry, and export-ready history.",
+    others: "Limited governance and fragmented observability.",
+  },
+];
+
 export default function HomePage() {
+  const appSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "FlowDrop",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    url: "https://flowdrop-ai.vercel.app",
+    description:
+      "FlowDrop is an AI workflow operating system for teams with command-center execution, automation, accountability, and audit-ready controls.",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+    },
+  };
+
   return (
     <main className="relative min-h-dvh overflow-hidden px-4 pb-16 pt-6 md:px-8 lg:px-12">
+      <Script id="flowdrop-software-schema" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(appSchema)}
+      </Script>
+
       <div
         className="pointer-events-none absolute -left-16 top-10 h-52 w-52 rounded-full bg-[rgba(45,107,228,0.22)] blur-3xl"
         style={{ animation: "orb-drift 14s ease-in-out infinite" }}
@@ -173,6 +238,52 @@ export default function HomePage() {
               <p className="mt-1 text-[12px] text-[var(--color-text-secondary)]">{item.label}</p>
             </article>
           ))}
+        </section>
+
+        <section className="mt-4 rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-5">
+          <h2 className="mb-3 text-[18px] font-semibold">Real screenshots: how teams actually run on FlowDrop</h2>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {screenshots.map((shot) => (
+              <article key={shot.title} className="rounded-[var(--radius-md)] border border-white/10 bg-[var(--color-surface-2)] p-3">
+                <div className="overflow-hidden rounded-[var(--radius-sm)] border border-white/10">
+                  <Image
+                    src={shot.src}
+                    alt={shot.alt}
+                    width={1400}
+                    height={900}
+                    className="h-auto w-full"
+                    priority={shot.title === "Today Command Center"}
+                  />
+                </div>
+                <p className="mt-2 text-[14px] font-medium">{shot.title}</p>
+                <p className="mt-1 text-[12px] text-[var(--color-text-secondary)]">{shot.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-5">
+          <h2 className="mb-3 text-[18px] font-semibold">Why teams choose FlowDrop over other apps</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-[12px]">
+              <thead>
+                <tr className="border-b border-white/10 text-[var(--color-text-tertiary)]">
+                  <th className="px-2 py-2">Category</th>
+                  <th className="px-2 py-2">FlowDrop</th>
+                  <th className="px-2 py-2">Typical alternatives</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparison.map((row) => (
+                  <tr key={row.point} className="border-b border-white/6 last:border-b-0">
+                    <td className="px-2 py-2 font-medium">{row.point}</td>
+                    <td className="px-2 py-2 text-[var(--color-success)]">{row.flowdrop}</td>
+                    <td className="px-2 py-2 text-[var(--color-text-secondary)]">{row.others}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="mt-4 rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-5">
