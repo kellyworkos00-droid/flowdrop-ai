@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDownWideNarrow, Filter, ListFilter, Search, Sparkles, Users } from "lucide-react";
+import { ArrowDownWideNarrow, Bookmark, Filter, ListFilter, Search, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropCard } from "@/components/ui/drop-card";
 import { getDrops } from "@/lib/drops";
@@ -13,6 +13,22 @@ import type { DropItem, DropStatus, DropType } from "@/types/drop";
 type StatusFilter = DropStatus | "all";
 type TypeFilter = DropType | "all";
 type SortMode = "newest" | "title_asc" | "title_desc";
+
+interface SavedView {
+  id: string;
+  label: string;
+  status: StatusFilter;
+  type: TypeFilter;
+  assignedToMe: boolean;
+  sort: SortMode;
+}
+
+const SAVED_VIEWS: SavedView[] = [
+  { id: "my_blockers", label: "My Blockers", status: "blocked", type: "all", assignedToMe: true, sort: "newest" },
+  { id: "due_week", label: "Due This Week", status: "all", type: "all", assignedToMe: false, sort: "newest" },
+  { id: "in_progress", label: "In Progress", status: "in_progress", type: "all", assignedToMe: false, sort: "newest" },
+  { id: "unassigned", label: "Unassigned", status: "todo", type: "all", assignedToMe: false, sort: "newest" },
+];
 
 const statusOptions: { label: string; value: StatusFilter }[] = [
   { label: "All", value: "all" },
@@ -54,6 +70,20 @@ export default function DropsPage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [assignedToMeOnly, setAssignedToMeOnly] = useState(false);
+  const [activeView, setActiveView] = useState<string | null>(null);
+
+  function applyView(view: SavedView) {
+    setActiveView(view.id);
+    setStatusFilter(view.status);
+    setTypeFilter(view.type);
+    setAssignedToMeOnly(view.assignedToMe);
+    setSortMode(view.sort);
+    setSearch("");
+  }
+
+  function clearView() {
+    setActiveView(null);
+  }
 
   useEffect(() => {
     if (query.data) {
@@ -117,10 +147,38 @@ export default function DropsPage() {
             <h2 className="font-[var(--font-display)] text-[22px] font-semibold">My Drops</h2>
             <p className="mt-1 text-[13px] text-[var(--color-text-secondary)]">Track what matters, focus your workflow, and move blockers fast.</p>
           </div>
-          <Button className="gap-1.5" onClick={() => setAssignedToMeOnly((prev) => !prev)} variant={assignedToMeOnly ? "primary" : "secondary"}>
+          <Button className="gap-1.5" onClick={() => { setAssignedToMeOnly((prev) => !prev); setActiveView(null); }} variant={assignedToMeOnly ? "primary" : "secondary"}>
             <Users className="h-3.5 w-3.5" />
             {assignedToMeOnly ? "Assigned to me" : "Show my work"}
           </Button>
+        </div>
+
+        {/* Saved views */}
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)]">
+            <Bookmark className="h-3.5 w-3.5" /> Views:
+          </span>
+          {SAVED_VIEWS.map((view) => (
+            <button
+              key={view.id}
+              onClick={() => (activeView === view.id ? clearView() : applyView(view))}
+              className={`rounded-full border px-3 py-1 text-[12px] font-medium transition-colors ${
+                activeView === view.id
+                  ? "border-[var(--color-brand-accent)] bg-[rgba(0,229,195,0.12)] text-[var(--color-brand-accent)]"
+                  : "border-white/10 bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:border-white/20 hover:text-[var(--color-text-primary)]"
+              }`}
+            >
+              {view.label}
+            </button>
+          ))}
+          {activeView && (
+            <button
+              onClick={clearView}
+              className="text-[11px] text-[var(--color-text-tertiary)] underline hover:text-[var(--color-text-secondary)]"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
         <div className="grid gap-3 lg:grid-cols-[1.6fr_1fr_1fr]">

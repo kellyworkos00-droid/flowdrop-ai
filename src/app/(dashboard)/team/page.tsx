@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { computeTeamKPIs, formatHours } from "@/lib/kpi/compute";
 import { useDropsStore } from "@/store/useDropsStore";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
@@ -14,15 +15,35 @@ type RoleFilter = "all" | "Product" | "Engineering" | "Design";
 type FocusFilter = "all" | "high_load" | "blocked" | "available";
 
 function getLoadTone(activeCount: number): string {
-  if (activeCount >= 3) {
-    return "text-[var(--color-danger)]";
-  }
-
-  if (activeCount === 2) {
-    return "text-[var(--color-warning)]";
-  }
-
+  if (activeCount >= 3) return "text-[var(--color-danger)]";
+  if (activeCount === 2) return "text-[var(--color-warning)]";
   return "text-[var(--color-success)]";
+}
+
+function WorkloadBar({ score, label }: { score: number; label: "underloaded" | "balanced" | "overloaded" }) {
+  const barColor =
+    label === "overloaded"
+      ? "bg-[var(--color-danger)]"
+      : label === "balanced"
+        ? "bg-[var(--color-warning)]"
+        : "bg-[var(--color-success)]";
+  const textColor =
+    label === "overloaded"
+      ? "text-[var(--color-danger)]"
+      : label === "balanced"
+        ? "text-[var(--color-warning)]"
+        : "text-[var(--color-success)]";
+  return (
+    <div className="mb-3">
+      <div className="mb-1 flex items-center justify-between text-[11px]">
+        <span className="text-[var(--color-text-tertiary)]">Workload</span>
+        <span className={`${textColor} font-medium capitalize`}>{label}</span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-3)]">
+        <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${score}%` }} />
+      </div>
+    </div>
+  );
 }
 
 export default function TeamPage() {
@@ -33,6 +54,8 @@ export default function TeamPage() {
   const [focusFilter, setFocusFilter] = useState<FocusFilter>("all");
   const [selectedMemberId, setSelectedMemberId] = useState<string | "all">("all");
 
+  const kpis = useMemo(() => computeTeamKPIs(drops, workspace.members), [drops, workspace.members]);
+
   const memberCards = useMemo(() => {
     return workspace.members.map((member) => {
       const assigned = drops.filter((drop) => drop.assignees.includes(member.id) || drop.assigneeNames.includes(member.name));
@@ -42,6 +65,7 @@ export default function TeamPage() {
       const todo = assigned.filter((drop) => drop.status === "todo").length;
       const completionRate = assigned.length ? Math.round((done / assigned.length) * 100) : 0;
       const focusDrop = assigned.find((drop) => drop.status === "in_progress") ?? assigned[0];
+      const memberKpi = kpis.members.find((k) => k.memberId === member.id || k.memberName === member.name);
 
       return {
         member,
@@ -52,9 +76,11 @@ export default function TeamPage() {
         todo,
         completionRate,
         focusDrop,
+        workloadScore: memberKpi?.workloadScore ?? 0,
+        workloadLabel: memberKpi?.workloadLabel ?? ("underloaded" as const),
       };
     });
-  }, [drops, workspace.members]);
+  }, [drops, kpis.members, workspace.members]);
 
   const filteredMembers = useMemo(() => {
     const searchTerm = search.trim().toLowerCase();
@@ -105,6 +131,13 @@ export default function TeamPage() {
     return byMember.slice(0, 5);
   }, [drops, selectedMemberId]);
 
+  const needsAttention = useMemo(() => {
+    return kpis.members
+      .filter((m) => m.workloadLabel === "overloaded" || m.blocked > 0)
+      .sort((a, b) => b.workloadScore + b.blocked * 30 - (a.workloadScore + a.blocked * 30))
+      .slice(0, 5);
+  }, [kpis.members]);
+
   return (
     <section className="space-y-4">
       <div className="rounded-[var(--radius-xl)] border border-white/10 bg-[var(--color-surface-1)] p-5">
@@ -142,6 +175,25 @@ export default function TeamPage() {
             <p className="mb-1 flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)]"><CheckCircle2 className="h-3.5 w-3.5" /> Completed</p>
             <p className="text-[18px] font-semibold text-[var(--color-success)]">{teamStats.completed}</p>
           </article>
+        </div>
+
+        {/* SLA KPI row */}
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-[var(--radius-md)] border border-white/8 bg-[var(--color-surface-2)] px-3 py-2.5">
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">Avg Cycle Time</p>
+            <p className="mt-0.5 text-[16px] font-semibold">{kpis.avgCycleHours > 0 ? formatHours(kpis.avgCycleHours) : "—"}</p>
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">create → done</p>
+          </div>
+          <div className="rounded-[var(--radius-md)] border border-[rgba(255,77,109,0.2)] bg-[rgba(255,77,109,0.06)] px-3 py-2.5">
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">Avg Blocked Time</p>
+            <p className="mt-0.5 text-[16px] font-semibold text-[var(--color-danger)]">{kpis.avgBlockedHours > 0 ? formatHours(kpis.avgBlockedHours) : "—"}</p>
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">across blocked items</p>
+          </div>
+          <div className="rounded-[var(--radius-md)] border border-white/8 bg-[var(--color-surface-2)] px-3 py-2.5">
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">Overdue</p>
+            <p className={`mt-0.5 text-[16px] font-semibold ${kpis.overdueCount > 0 ? "text-[var(--color-warning)]" : ""}`}>{kpis.overdueCount}</p>
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">past due date</p>
+          </div>
         </div>
 
         <div className="mt-4 grid gap-3 lg:grid-cols-[1.5fr_1fr_1fr]">
@@ -185,6 +237,8 @@ export default function TeamPage() {
                 </Badge>
               </div>
 
+              <WorkloadBar score={entry.workloadScore} label={entry.workloadLabel} />
+
               <div className="mb-3 grid grid-cols-4 gap-2 text-center text-[11px]">
                 <div className="rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] p-2"><p className="text-[var(--color-text-tertiary)]">To Do</p><p>{entry.todo}</p></div>
                 <div className="rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] p-2"><p className="text-[var(--color-text-tertiary)]">In Progress</p><p className={getLoadTone(entry.inProgress)}>{entry.inProgress}</p></div>
@@ -227,26 +281,72 @@ export default function TeamPage() {
                   No drops in this view.
                 </p>
               ) : (
-                highlightedDrops.map((drop) => (
-                  <div key={drop.id} className="rounded-[var(--radius-md)] border border-white/10 bg-[var(--color-surface-2)] p-2.5">
-                    <div className="mb-1 flex items-center justify-between gap-2">
-                      <p className="line-clamp-1 text-[12px] font-medium">{drop.title}</p>
-                      <Badge>{drop.status.replace("_", " ")}</Badge>
+                highlightedDrops.map((drop) => {
+                  const isBlocked = drop.status === "blocked";
+                  const blockedH =
+                    isBlocked && drop.blockedSince
+                      ? (new Date().getTime() - new Date(drop.blockedSince).getTime()) / (1000 * 60 * 60)
+                      : 0;
+                  return (
+                    <div
+                      key={drop.id}
+                      className={`rounded-[var(--radius-md)] border p-2.5 ${
+                        isBlocked
+                          ? "border-[rgba(255,77,109,0.28)] bg-[rgba(255,77,109,0.08)]"
+                          : "border-white/10 bg-[var(--color-surface-2)]"
+                      }`}
+                    >
+                      <div className="mb-1 flex items-center justify-between gap-2">
+                        <p className="line-clamp-1 text-[12px] font-medium">{drop.title}</p>
+                        <Badge>{drop.status.replace("_", " ")}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-[var(--color-text-secondary)]">
+                        <span>{drop.assigneeNames.join(", ") || "Unassigned"}</span>
+                        {isBlocked && blockedH > 0 && (
+                          <span className="font-medium text-[var(--color-danger)]">🔒 {formatHours(blockedH)}</span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-[11px] text-[var(--color-text-secondary)]">{drop.assigneeNames.join(", ") || "Unassigned"}</p>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </article>
 
           <article className="rounded-[var(--radius-lg)] border border-white/10 bg-[var(--color-surface-1)] p-4">
-            <h3 className="mb-2 text-[14px] font-semibold">Blocker Radar</h3>
-            <p className="text-[12px] text-[var(--color-text-secondary)]">
-              {teamStats.blocked > 0
-                ? `${teamStats.blocked} blocked item${teamStats.blocked === 1 ? "" : "s"} need follow-up to keep flow moving.`
-                : "No blockers right now. Team flow is healthy."}
-            </p>
+            <h3 className="mb-3 flex items-center gap-1.5 text-[14px] font-semibold">
+              <AlertTriangle className="h-4 w-4 text-[var(--color-warning)]" />
+              Needs Attention
+            </h3>
+            {needsAttention.length === 0 ? (
+              <p className="text-[12px] text-[var(--color-text-secondary)]">
+                Team flow is healthy — no overloaded or blocked members right now.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {needsAttention.map((m) => (
+                  <div key={m.memberId} className="rounded-[var(--radius-md)] border border-white/10 bg-[var(--color-surface-2)] p-3">
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                      <p className="text-[13px] font-medium">{m.memberName}</p>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${
+                          m.workloadLabel === "overloaded"
+                            ? "bg-[rgba(255,77,109,0.15)] text-[var(--color-danger)]"
+                            : "bg-[rgba(245,166,35,0.15)] text-[var(--color-warning)]"
+                        }`}
+                      >
+                        {m.workloadLabel}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-[11px] text-[var(--color-text-secondary)]">
+                      <span>{m.wip} in progress</span>
+                      {m.blocked > 0 && <span className="text-[var(--color-danger)]">{m.blocked} blocked</span>}
+                      {m.avgBlockedHours > 0 && <span>avg {formatHours(m.avgBlockedHours)} stuck</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </article>
         </aside>
       </div>

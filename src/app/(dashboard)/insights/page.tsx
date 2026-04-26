@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AlertTriangle, Brain, ChartColumnIncreasing, Gauge, Lightbulb, Target, TimerReset } from "lucide-react";
+import { AlertTriangle, Brain, BarChart2, ChartColumnIncreasing, Gauge, Lightbulb, Target, TimerReset, TrendingDown, TrendingUp } from "lucide-react";
 import { InsightCard } from "@/components/ai/insight-card";
 import { NudgeBanner } from "@/components/ai/nudge-banner";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { computeTeamKPIs, formatHours } from "@/lib/kpi/compute";
 import { useDropsStore } from "@/store/useDropsStore";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
@@ -147,6 +148,7 @@ export default function InsightsPage() {
     () => scopedDrops.filter((drop) => drop.status === "todo" || drop.status === "in_progress").slice(0, 5),
     [scopedDrops],
   );
+  const teamKpis = useMemo(() => computeTeamKPIs(scopedDrops, workspace.members), [scopedDrops, workspace.members]);
 
   return (
     <section className="space-y-4">
@@ -180,6 +182,42 @@ export default function InsightsPage() {
             <p className="text-[11px] text-[var(--color-text-tertiary)]">Blocked Risk</p>
             <p className="text-[20px] font-semibold text-[var(--color-danger)]">{stats.blockerRate}%</p>
           </article>
+        </div>
+
+        {/* Weekly KPIs row */}
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-[var(--radius-md)] border border-white/8 bg-[var(--color-surface-2)] px-3 py-2.5">
+            <div className="mb-1 flex items-center justify-between">
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">Avg Cycle Time</p>
+              <BarChart2 className="h-3.5 w-3.5 text-[var(--color-brand-accent)]" />
+            </div>
+            <p className="text-[17px] font-semibold">{teamKpis.avgCycleHours > 0 ? formatHours(teamKpis.avgCycleHours) : "—"}</p>
+            <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">create → done</p>
+          </div>
+          <div className="rounded-[var(--radius-md)] border border-[rgba(255,77,109,0.2)] bg-[rgba(255,77,109,0.06)] px-3 py-2.5">
+            <div className="mb-1 flex items-center justify-between">
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">Avg Blocked Time</p>
+              <TrendingDown className="h-3.5 w-3.5 text-[var(--color-danger)]" />
+            </div>
+            <p className="text-[17px] font-semibold text-[var(--color-danger)]">{teamKpis.avgBlockedHours > 0 ? formatHours(teamKpis.avgBlockedHours) : "—"}</p>
+            <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">per blocked item</p>
+          </div>
+          <div className="rounded-[var(--radius-md)] border border-white/8 bg-[var(--color-surface-2)] px-3 py-2.5">
+            <div className="mb-1 flex items-center justify-between">
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">WIP Count</p>
+              <TrendingUp className="h-3.5 w-3.5 text-[var(--color-warning)]" />
+            </div>
+            <p className="text-[17px] font-semibold">{teamKpis.wip}</p>
+            <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">in-progress now</p>
+          </div>
+          <div className="rounded-[var(--radius-md)] border border-white/8 bg-[var(--color-surface-2)] px-3 py-2.5">
+            <div className="mb-1 flex items-center justify-between">
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">Overdue</p>
+              <AlertTriangle className="h-3.5 w-3.5 text-[var(--color-warning)]" />
+            </div>
+            <p className={`text-[17px] font-semibold ${teamKpis.overdueCount > 0 ? "text-[var(--color-warning)]" : ""}`}>{teamKpis.overdueCount}</p>
+            <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">past due date</p>
+          </div>
         </div>
 
         <div className="mt-4 grid gap-3 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
