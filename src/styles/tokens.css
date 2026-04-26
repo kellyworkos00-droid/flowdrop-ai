@@ -1,0 +1,82 @@
+:root {
+  --color-brand-primary: #2d6be4;
+  --color-brand-secondary: #1a1a2e;
+  --color-brand-accent: #00e5c3;
+
+  --color-surface-0: #0d0f1a;
+  --color-surface-1: #141726;
+  --color-surface-2: #1e2236;
+  --color-surface-3: #252a42;
+
+  --color-text-primary: #f0f2ff;
+  --color-text-secondary: #8b90b8;
+  --color-text-tertiary: #555a7a;
+
+  --color-success: #00c48c;
+  --color-warning: #f5a623;
+  --color-danger: #ff4d6d;
+  --color-info: #2d6be4;
+
+  --color-ai-glow: rgba(0, 229, 195, 0.15);
+  --color-ai-border: rgba(0, 229, 195, 0.3);
+  --color-ai-text: #00e5c3;
+
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+  --border-default: 1px solid rgba(255, 255, 255, 0.1);
+  --border-strong: 1px solid rgba(255, 255, 255, 0.18);
+
+  --font-display: "Sora", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 22px;
+  --text-xl: 28px;
+  --text-2xl: 36px;
+  --text-3xl: 48px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow-blue: 0 0 24px rgba(45, 107, 228, 0.35);
+  --shadow-glow-teal: 0 0 24px rgba(0, 229, 195, 0.25);
+
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+  --duration-slow: 380ms;
+  --duration-page: 500ms;
+}
+
+@keyframes orb-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(24px, -20px, 0) scale(1.1); }
+  100% { transform: translate3d(-16px, 12px, 0) scale(0.95); }
+}
+
+@keyframes drop-pulse {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 0.8; transform: scale(1); }
+}

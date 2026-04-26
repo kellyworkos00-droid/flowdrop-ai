@@ -1,0 +1,16 @@
+.flow-shell {
+  min-height: 100dvh;
+  background: radial-gradient(circle at 20% 20%, rgba(45, 107, 228, 0.12), transparent 38%),
+    radial-gradient(circle at 80% 15%, rgba(0, 229, 195, 0.1), transparent 36%),
+    var(--color-surface-0);
+}
+
+.flow-text-muted {
+  color: var(--color-text-secondary);
+}
+
+.flow-panel {
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-1);
+}
