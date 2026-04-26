@@ -17,7 +17,7 @@ export function TopBar({ title, className }: TopBarProps) {
   const { setNewDropModalOpen } = useDropsStore();
 
   return (
-    <header className={`flex h-14 items-center gap-3 border-b border-white/6 bg-[var(--color-surface-0)] px-4 ${className ?? ""}`}>
+    <header className={`sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-white/6 bg-[rgba(13,15,26,0.92)] px-4 backdrop-blur-md ${className ?? ""}`}>
       <h1 className="font-[var(--font-display)] text-[18px] font-semibold">{title}</h1>
       <div className="mx-auto w-full max-w-[400px]">
         <Input kind="search" placeholder="Search drops, people, files..." />

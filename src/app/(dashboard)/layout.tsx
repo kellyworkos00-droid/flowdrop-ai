@@ -27,11 +27,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const title = titleMap[pathname] ?? "FlowDrop";
 
   return (
-    <div className="flow-shell flex min-h-dvh">
+    <div className="flow-shell flex h-dvh overflow-hidden">
       <Sidebar pathname={pathname} />
-      <div className="flex min-h-dvh flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <TopBar title={title} />
-        <main className="flex-1 p-4 pb-24 md:p-6 md:pb-6">{children}</main>
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 pb-24 md:p-6 md:pb-6">{children}</main>
       </div>
       <NewDropModal />
       <DropDetailDrawer />
